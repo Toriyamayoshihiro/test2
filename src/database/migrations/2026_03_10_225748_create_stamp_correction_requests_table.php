@@ -21,6 +21,7 @@ class CreateStampCorrectionRequestsTable extends Migration
             $table->varchar('memo');
             $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

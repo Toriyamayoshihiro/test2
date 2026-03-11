@@ -20,7 +20,10 @@ class Attendance extends Model
     public function rests(){
        return $this->hasMany(RestTime::class);
     }
-    public function requests(){
-       return $this->hasMany(StampCorrectionRequest::class);
+    public function stamps(){
+       return $this->hasOne(StampCorrectionRequest::class);
+    }
+    public function rest_stamps(){
+       return $this->hasOne(RestStampCorrectionRequest::class);
     }
 }

@@ -17,8 +17,9 @@ class CreateRestStampCorrectionRequestsTable extends Migration
             $table->id();
             $table->dateTime('request_rest_start');
             $table->dateTime('request_end_start');
-            $table->foreignId('stamp_correction_request_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
