@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\AttendanceRequestStatus;
 
 class StampCorrectionRequest extends Model
 {
@@ -16,6 +17,9 @@ class StampCorrectionRequest extends Model
         'request_end_time',
         'memo',
         'attendance_id',
+    ];
+    protected $casts = [
+        'status' => AttendanceRequestStatus::class,
     ];
     public function attendance(){ 
         return $this->belongsTo(Attendance::class);

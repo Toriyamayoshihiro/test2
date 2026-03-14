@@ -18,7 +18,7 @@ class CreateStampCorrectionRequestsTable extends Migration
             $table->unsignedTinyInteger('status')->default(0);
             $table->dateTime('request_start_time');
             $table->dateTime('request_end_time');
-            $table->varchar('memo');
+            $table->string('memo');
             $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
