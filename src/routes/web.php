@@ -30,6 +30,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/attendance/{attendance_id}', [AdminController::class, 'admin_attendance_detail']);
     Route::get('/admin/staff/list', [AdminController::class, 'admin_staff_list']);
     Route::get('/admin/attendance/staff/{user_id}', [AdminController::class, 'admin_staff_attendance']);
-    Route::get('/stamp_correction_request/list', [AdminController::class, 'admin_request_list']);
-    Route::get('//stamp_correction_request/approve/{attendance_correct_request_id}', [AdminController::class, 'admin_request_approve']);
+    Route::get('/admin/stamp_correction_request/list', [AdminController::class, 'admin_request_list']);
+    Route::get('/admin/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminController::class, 'admin_request_approve']);
+    Route::get('/admin/logout',[AdminController::class, 'getLogout'])->name('admin.admin_logout');
 });

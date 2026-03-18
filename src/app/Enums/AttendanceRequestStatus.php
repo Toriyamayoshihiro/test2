@@ -9,7 +9,7 @@ enum AttendanceRequestStatus: int
     public function label(): string
     {
         return match ($this) {
-            Status::Pending  => '申請中',
+            Status::Pending  => '承認待ち',
             Status::Approved => '承認',
             Status::Rejected => '却下'
         };
