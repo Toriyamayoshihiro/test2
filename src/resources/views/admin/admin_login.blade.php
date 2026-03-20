@@ -1,15 +1,16 @@
-@extends('layout.auth')
+@extends('layouts.default')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 @endsection
 
 @section('content')
+@include('components.header')
 <div class="login-form__content">
   <div class="login-form__heading">
     <h1>管理者ログイン</h1>
   </div>
-  <form class="form" action="/login" method="post">
+  <form class="form" action="/admin/login" method="post">
     @csrf
     <div class="form__group">
       <div class="form__group-title">

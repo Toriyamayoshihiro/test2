@@ -2,7 +2,7 @@
     <div class="header__logo">
         <h1><a href="/">COACHTECH</a></h1>
     </div>
-    @if( !in_array(Route::currentRouteName(), ['register', 'login', 'verification.notice','admin_login']) )
+    @if( !in_array(Route::currentRouteName(), ['admin.register', 'admin.login', 'admin.verification.notice','admin.admin_login']) )
         
         @auth
             @if(Auth::user()->is_admin)

@@ -21,16 +21,16 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('//attendance/detail/{attendacne_id}', [AdminController::class, 'attendance_detail']);
     Route::get('/stamp_correction_request/list', [AdminController::class, 'request_list']);
 });
-Route::prefix('admin')->middleware('guest')->group(function () {
-    Route::get('/admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/admin/login', [AdminController::class, 'login']);
+Route::prefix('admin')->group(function () {
+    Route::get('/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/login', [AdminController::class, 'login']);
 });
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/attendance/list', [AdminController::class, 'index']);
-    Route::get('/admin/attendance/{attendance_id}', [AdminController::class, 'admin_attendance_detail']);
-    Route::get('/admin/staff/list', [AdminController::class, 'admin_staff_list']);
-    Route::get('/admin/attendance/staff/{user_id}', [AdminController::class, 'admin_staff_attendance']);
-    Route::get('/admin/stamp_correction_request/list', [AdminController::class, 'admin_request_list']);
-    Route::get('/admin/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminController::class, 'admin_request_approve']);
-    Route::get('/admin/logout',[AdminController::class, 'getLogout'])->name('admin.admin_logout');
+Route::prefix('admin')->group(function () {
+    Route::get('/attendance/list', [AdminController::class, 'index']);
+    Route::get('/attendance/{attendance_id}', [AdminController::class, 'admin_attendance_detail']);
+    Route::get('/staff/list', [AdminController::class, 'admin_staff_list']);
+    Route::get('/attendance/staff/{user_id}', [AdminController::class, 'admin_staff_attendance']);
+    Route::get('/stamp_correction_request/list', [AdminController::class, 'admin_request_list']);
+    Route::get('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminController::class, 'admin_request_approve']);
+    Route::get('/logout',[AdminController::class, 'getLogout'])->name('admin.logout');
 });

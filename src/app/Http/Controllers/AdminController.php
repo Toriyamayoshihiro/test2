@@ -6,15 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdminRequest;
+use App\Models\User;
 
 class AdminController extends Controller
 {
     public function showLoginForm()
     {
-        return view('admin_login');
+        return view('admin.admin_login');
     }
 
-    public function login(AdminRequest $request)
+    public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
         $credentials['is_admin'] = true;
@@ -29,8 +30,8 @@ class AdminController extends Controller
         return redirect()->route('admin.admin_logout');
     }
     public function index(){
-        $users =  User::where('is_admin', '!=', 'true')-with('attendances')->get();
-        return view('admin_attendance_litst',compact('users'));
+        $users =  User::where('is_admin', '!=', 'true')->with('attendances')->get();
+        return view('admin.admin_attendance_list',compact('users'));
     }
     public function admin_attendance_detail($attendance_id){
         $attendance = Attendance::with('user','resets')->find($attendance_id);
