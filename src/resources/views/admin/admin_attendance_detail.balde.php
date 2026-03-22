@@ -4,5 +4,6 @@
 <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 @endsection
 
-@section('content)
+@section('content')
 @include('components.header')
+@endsection

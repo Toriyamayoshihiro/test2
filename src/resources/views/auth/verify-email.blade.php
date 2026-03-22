@@ -1,4 +1,4 @@
-@extends('layout.auth')
+@extends('layouts.default')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/verify-email.css') }}">

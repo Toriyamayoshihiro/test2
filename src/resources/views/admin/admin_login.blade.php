@@ -12,6 +12,7 @@
   </div>
   <form class="form" action="/admin/login" method="post">
     @csrf
+    <input type="hidden" name='login_type' value='admin'>
     <div class="form__group">
       <div class="form__group-title">
         <span class="form__label--item">メールアドレス</span>

@@ -16,10 +16,10 @@ use App\Http\Controllers\AdminController;
 */
 
 Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/attendance', [AdminController::class, 'index']);
-    Route::get('/attendance/list', [AdminController::class, 'attendance_list']);
-    Route::get('//attendance/detail/{attendacne_id}', [AdminController::class, 'attendance_detail']);
-    Route::get('/stamp_correction_request/list', [AdminController::class, 'request_list']);
+    Route::get('/attendance', [AttendanceController::class, 'index']);
+    Route::get('/attendance/list', [AttendanceController::class, 'attendance_list']);
+    Route::get('//attendance/detail/{attendacne_id}', [AttendanceController::class, 'attendance_detail']);
+    Route::get('/stamp_correction_request/list', [AttendanceController::class, 'request_list']);
 });
 Route::prefix('admin')->group(function () {
     Route::get('/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
