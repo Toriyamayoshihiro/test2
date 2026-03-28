@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdminRequest;
 use App\Models\User;
 use App\Models\StampCorrectionRequest;
+use App\Models\RestStampCorrectionRequest;
 
 class AdminController extends Controller
 {
@@ -35,6 +36,7 @@ class AdminController extends Controller
         return view('admin.admin_attendance_list',compact('users'));
     }
     public function admin_attendance_detail($attendance_id){
+        
         $attendance = Attendance::with('user','resets')->find($attendance_id);
         return view('admin.admin_attendance_detail',compact('attendance'));
     }
@@ -51,7 +53,7 @@ class AdminController extends Controller
     return view('admin.admin_request_list',compact('stamps'));
    }
    public function admin_request_approve($stamp_id){
-        $stamp = Stamp::with('attendance.user')->find($stamp_id);
+        $stamp = StampCorrectionRequest::with('attendance.user','attendance.stamp_rest')->find($stamp_id);
         return view('admin.admin_correction_approve',compact('stamp'));
    }
 }

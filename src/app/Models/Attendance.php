@@ -23,7 +23,7 @@ class Attendance extends Model
     public function stamp(){
        return $this->hasOne(StampCorrectionRequest::class);
     }
-    public function rest_stamp(){
-       return $this->hasOne(RestStampCorrectionRequest::class);
+    public function rests_stamp(){
+       return $this->hasMany(RestStampCorrectionRequest::class);
     }
 }

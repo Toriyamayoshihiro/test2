@@ -10,7 +10,7 @@
   <div class="login-form__heading">
     <h1>管理者ログイン</h1>
   </div>
-  <form class="form" action="/admin/login" method="post">
+  <form class="form" action="/login" method="post">
     @csrf
     <input type="hidden" name='login_type' value='admin'>
     <div class="form__group">
