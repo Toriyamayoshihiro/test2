@@ -1,6 +1,6 @@
 <header class="header">
     <div class="header__logo">
-        <h1><a href="/">COACHTECH</a></h1>
+        <h1><a href="/attendance">COACHTECH</a></h1>
     </div>
     @if( !in_array(Route::currentRouteName(), ['auth.register', 'auth.login', 'auth.verify-email','admin.login']) )
         

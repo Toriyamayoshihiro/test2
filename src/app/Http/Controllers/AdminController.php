@@ -17,16 +17,16 @@ class AdminController extends Controller
         return view('admin.admin_login');
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-        $credentials['is_admin'] = true;
+    //public function login(Request $request)
+    //{
+    //    $credentials = $request->only('email', 'password');
+    //    $credentials['is_admin'] = true;
 
-        if (Auth::attempt($credentials)) {
-            return redirect('/admin/attendance/list');
-        }
-        return back()->withErrors(['email' => 'ログインに失敗しました']);
-    }
+    //    if (Auth::attempt($credentials)) {
+    //        return redirect('/admin/attendance/list');
+    //    }
+    //    return back()->withErrors(['email' => 'ログインに失敗しました']);
+    //}
     public function getLogout(){
         Auth::logout();
         return redirect()->route('admin.login');
