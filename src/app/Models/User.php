@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Enums\AttendanceStatus;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,11 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'attendance_status',
+    ];
+    protected $casts =[
+        'attendance_status' => 'integer',
+        'email_verified_at' => 'datetime'
     ];
 
     /**
@@ -39,9 +45,6 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
      public function attendances(){
        return $this->hasMany(Attendance::class);
     }

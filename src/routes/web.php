@@ -17,7 +17,7 @@ use App\Http\Controllers\AdminController;
 
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'index']);
-    Route::post('/attendance',[AttendanceController::class, 'start_work']);
+    Route::post('/attendance',[AttendanceController::class, 'store']);
     Route::get('/attendance/list', [AttendanceController::class, 'attendance_list']);
     Route::get('//attendance/detail/{attendacne_id}', [AttendanceController::class, 'attendance_detail']);
     Route::get('/stamp_correction_request/list', [AttendanceController::class, 'request_list']);

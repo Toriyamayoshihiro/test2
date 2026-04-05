@@ -8,18 +8,17 @@
 
 @include('components.header')
 <div class="currentDate">
-    {{$currentDate->locale('ja')->isoFormat('YYYY年M月D日(ddd)')}}
+    {{$currentDateTime->locale('ja')->isoFormat('YYYY年M月D日(ddd)')}}
 </div>
 <div>
-    {{$currentTime->format('H:i')}}
+    {{$currentDateTime->format('H:i')}}
 </div>
 <div>
     <form action="/attendance" method="post">
         @csrf
-        <input type="text" name="Date" value="{{$currentDate}}">
-        <input type="text" name="start_time" value="{{$currentTime}}">
-        <button>{{$status}}</button>
-        <button>{{$status2}}</button>
+        @foreach($buttons as $button)
+            <button type="submit" name="action" value="{{$button['label']}}" class="attendance_btn">{{$button['label']}}</button>
+        @endforeach
     </form>
 </div>
 @endsection
