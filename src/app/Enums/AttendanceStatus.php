@@ -12,8 +12,8 @@ enum AttendanceStatus: int
     {
         return match ($this) {
             self::Off  => '勤務外',
-            self::Working => '勤務中',
-            self::Resting => '休憩中'
+            self::Working => '出勤中',
+            self::Resting => '休憩中',
         };
     }
     public function button(): array

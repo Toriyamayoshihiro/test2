@@ -18,9 +18,17 @@ class AttendanceController extends Controller
         $currentDateTime = Carbon::now('Asia/Tokyo');
         $user = Auth::user();
         $attendance = Attendance::where('user_id',$user->id)
-                                    ->where('date',$currentDateTime->toDateString())->with('rests')->first();
+                                    ->latest()->with('rests')->first();
         $statusEnum = AttendanceStatus::from($user->attendance_status);
+        $statusLabel = $statusEnum->label();
         $buttons = $statusEnum->button();
+        $message = null;
+        $showButtons = true;
+        if($attendance && $attendance->date->toDateString() === $currentDateTime->toDateString() && $attendance->end_time ){
+            $message = 'お疲れさまでした。';
+            $statusLabel = '退勤済';
+            $showButtons = false;
+        }
         //switch($user->attendance_status){
             //case AttendanceStatus::Off :
                 //$status = '出勤';
@@ -33,12 +41,13 @@ class AttendanceController extends Controller
                 //$status = '休憩戻';
                 //break;
         //}
-        return view('attendance',compact('currentDateTime','user','attendance','buttons'));
+        return view('attendance',compact('currentDateTime','user','attendance','buttons','message','statusLabel','showButtons'));
     }
     public function store(Request $request){
         $user = Auth::user();
-        $date = Carbon::now('Asia/Tokyo')->format('Y-m-d');
-        $currentTime=  Carbon::now('Asia/Tokyo')->format('H:i:s');
+        $now = Carbon::now('Asia/Tokyo');
+        $date = $now->toDateString();
+        $currentTime=  $now->format('H:i:s');
         $action = $request->action;
         switch($action){
             case 'in_attendance':
@@ -52,13 +61,13 @@ class AttendanceController extends Controller
                 ]);
                 break;
             case 'out_attendance':
-                $attendance = Attendance::where('date',$date)
-                                                ->where('user_id',$user->id)->with('rests')->first();
+                $attendance = Attendance::where('user_id',$user->id)->latest()->with('rests')->first();
+                                                
                 
                 if(!$attendance->rests()->exists()){
                     return redirect('/attendance')->with('flashError','休憩してください');
                 }
-                if(!$attendance->rests()->whereNull('rest_end')->exists()){
+                if($attendance->rests()->whereNull('rest_end')->exists()){
                     return redirect('/attendance')->with('flashError','休憩終了してください');
                 }
                 $attendance->end_time = $currentTime;
@@ -68,21 +77,19 @@ class AttendanceController extends Controller
                 ]);
                 break;
             case 'in_rest':
-                $attendance = Attendance::where('date',$date)
-                                        ->where('user_id',$user->id)->first();
-                $rest = new Rest();
+                $attendance = Attendance::where('user_id',$user->id)>latest()->first();
+                $rest = new RestTime();
                 $rest->attendance_id = $attendance->id;
-                $rest->rest_start = $currentTime;
+                $rest->rest_start = $now;
                 $rest->save();
                 $user->update([
                     'attendance_status' => AttendanceStatus::Resting->value
                 ]);
                 break;
             case 'out_rest':
-                $attendance = Attendance::where('date',$date)
-                                        ->where('user_id',$user->id)->with('rests')->first();
+                $attendance = Attendance::where('user_id',$user->id)>latest()->first(); 
                 $rest = $attendance->rests()->whereNull('rest_end')->latest()->first();
-                $rest->rest_end = $currentTime;
+                $rest->rest_end = $now;
                 $rest->save();
                 $user->update([
                     'attendance_status' => AttendanceStatus::Working->value
@@ -93,8 +100,25 @@ class AttendanceController extends Controller
     }
     public function attendance_list(){
         $user = Auth::user();
-        $attendances = Attendance::where('user_id',$user->id)->with('rests')->get();
-        return view('attendance_list',compact('user','attendances'));
+        $attendances = Attendance::where('user_id',$user->id)
+                                    ->whereNotNull('end_time')->with('rests')->get();
+        $now = Carbon::now();
+        $currentTime = $now->format('Y/m');
+        foreach($attendances as $attendance){
+            $total_rests = 0;
+            $work_time = $attendance->start_time->diffInSeconds($attendance->end_time);
+            foreach($attendance->rests as $rest){
+                if($rest->rest_start && $rest->rest_end){
+                    $second = $rest->rest_start->diffInSeconds($rest->rest_end); 
+                    $total_rests += $second;
+                }
+            }
+            $attendance->total_rests = $total_rests;
+            $attendance->total_attendances = $work_time - $total_rests;
+        }
+        
+        
+        return view('attendance_list',compact('user','attendances','currentTime'));
     }
     public function attendance_detail($attendance_id){
         $attendance = Attendance::with(['user','rests','stamp','rests_stamp'])->findOrFail($attendance_id);

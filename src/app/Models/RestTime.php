@@ -13,6 +13,10 @@ class RestTime extends Model
         'rest_end',
         'attendance_id',
     ];
+    protected $casts = [
+        'rest_start' => 'datetime',
+        'rest_end' => 'datetime',
+    ];
     public function attendance(){ 
         return $this->belongsTo(Attendance::class);
     }
