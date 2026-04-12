@@ -3,8 +3,9 @@
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/attendnce_list.css') }}">
 @endsection
-
+@section('title','勤怠一覧')
 @section('content')
+
 @include('components.header')
 {{$currentTime}}
 

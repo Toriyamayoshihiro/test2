@@ -121,11 +121,11 @@ class AttendanceController extends Controller
         return view('attendance_list',compact('user','attendances','currentTime'));
     }
     public function attendance_detail($attendance_id){
-        $attendance = Attendance::with(['user','rests','stamp','rests_stamp'])->findOrFail($attendance_id);
+        $attendance = Attendance::with(['user','rests','stamp','rests_stamp'])->findOrFail($attendance_id); 
         $stamp = StampCorrectionRequest::where('attendance_id',$attendance_id)->first();
         $message = $stamp ? '承認待ちのため修正はできません。' : '';
 
-        return view('attendance.detail',compact('attendance','stamp'));
+        return view('attendance_detail',compact('attendance','stamp','message'));
     }
     public function request_list(Request $request){
         $user = Auth::user();

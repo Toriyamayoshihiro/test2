@@ -28,7 +28,7 @@ Route::middleware(['auth','verified'])->group(function () {
 //});
 Route::prefix('admin')->group(function () {
     Route::get('/attendance/list', [AdminController::class, 'index']);
-    Route::get('/attendance/{attendance_id}', [AdminController::class, 'admin_attendance_detail']);
+    Route::get('/attendance/detail/{attendance_id}', [AdminController::class, 'admin_attendance_detail']);
     Route::get('/staff/list', [AdminController::class, 'admin_staff_list']);
     Route::get('/attendance/staff/{user_id}', [AdminController::class, 'admin_staff_attendance']);
     Route::get('/stamp_correction_request/list', [AdminController::class, 'admin_request_list']);
