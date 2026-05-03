@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StampCorrectionRequest;
 use App\Models\RestStampCorrectionRequest;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use App\Enums\AttendanceStatus;
 
 class AttendanceController extends Controller
@@ -77,7 +78,7 @@ class AttendanceController extends Controller
                 ]);
                 break;
             case 'in_rest':
-                $attendance = Attendance::where('user_id',$user->id)>latest()->first();
+                $attendance = Attendance::where('user_id',$user->id)->latest()->first();
                 $rest = new RestTime();
                 $rest->attendance_id = $attendance->id;
                 $rest->rest_start = $now;
@@ -87,7 +88,7 @@ class AttendanceController extends Controller
                 ]);
                 break;
             case 'out_rest':
-                $attendance = Attendance::where('user_id',$user->id)>latest()->first(); 
+                $attendance = Attendance::where('user_id',$user->id)->latest()->first(); 
                 $rest = $attendance->rests()->whereNull('rest_end')->latest()->first();
                 $rest->rest_end = $now;
                 $rest->save();
@@ -98,12 +99,34 @@ class AttendanceController extends Controller
         }
                 return redirect('/attendance');
     }
-    public function attendance_list(){
+    public function attendance_list(Request $request){
         $user = Auth::user();
-        $attendances = Attendance::where('user_id',$user->id)
-                                    ->whereNotNull('end_time')->with('rests')->get();
+        $date = $request->input('month')
+                ? Carbon::parse($request->input('month'))
+                : Carbon::now();
         $now = Carbon::now();
-        $currentTime = $now->format('Y/m');
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth   = $date->copy()->endOfMonth();
+        $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
+
+        $dates = [];
+        foreach ($period as $day) {
+            $dates[] = $day->toDateString();
+        }
+
+        $attendances = Attendance::where('user_id',$user->id)
+                                    ->whereNotNull('end_time')->whereBetween('date',[
+                                        $startOfMonth->toDateString(),
+                                        $endOfMonth->toDateString()
+                                        ])
+                                    ->with('rests')->get()
+                                    ->keyBy(function ($item) {
+                                        return $item->date->toDateString();
+                                    });
+        $currentTime = $date->format('Y/m');
+        $prevMonth = $date->copy()->subMonth()->format('Y-m');
+        $nextMonth = $date->copy()->addMonth()->format('Y-m');
+        $selectedMonth = $date->format('Y/m');
         foreach($attendances as $attendance){
             $total_rests = 0;
             $work_time = $attendance->start_time->diffInSeconds($attendance->end_time);
@@ -118,7 +141,7 @@ class AttendanceController extends Controller
         }
         
         
-        return view('attendance_list',compact('user','attendances','currentTime'));
+        return view('attendance_list',compact('user','attendances','currentTime','dates','date','prevMonth','nextMonth','selectedMonth'));
     }
     public function attendance_detail($attendance_id){
         $attendance = Attendance::with(['user','rests','stamp','rests_stamp'])->findOrFail($attendance_id); 

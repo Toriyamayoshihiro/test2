@@ -25,13 +25,31 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->instance(LogoutResponse::class, new class implements LogoutResponse {
-        public function toResponse($request)
-        {
-            return redirect('/attendance');
-        }
+
+        $this->app->singleton(LogoutResponse::class, function () {
+            return new class implements LogoutResponse {
+                public function toResponse($request)
+                {
+                    return redirect('/attendance');
+                }
+            };
+        });
+        $this->app->singleton(LoginResponse::class, function () {
+            return new class implements LoginResponse {
+                public function toResponse($request)
+                {
+            
+                    $user = auth()->user();
+
+                    if ($user && $user->is_admin) {
+                        return redirect('/admin/attendance/list');
+                    }
+
+                    return redirect('/attendance');
+                }
+        };
     });
-    }
+}
 
     /**
      * Bootstrap any application services.
@@ -51,7 +69,7 @@ class FortifyServiceProvider extends ServiceProvider
             $email = (string) $request->email;
 
             return Limit::perMinute(10)->by($email . $request->ip());
-            });
+        });
         Fortify::authenticateUsing(function (Request $request){
             $user = User::where('email',$request->email)->first();
 

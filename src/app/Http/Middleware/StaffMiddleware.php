@@ -4,9 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class CheckUserRole
+class StaffMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,11 +17,11 @@ class CheckUserRole
     public function handle($request, Closure $next)
     {
         if (!auth()->check()) {
-        return redirect('/admin/login');
+        return redirect('/login');
         }
-        if (!auth()->user()->is_admin) {
-            return redirect('/attendance');
-            
+        if (auth()->user()->is_admin) {
+            return redirect('/admin/attendance/list');
+            // または abort(403);
         }
 
         return $next($request);

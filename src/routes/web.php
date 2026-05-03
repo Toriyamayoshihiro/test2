@@ -15,18 +15,18 @@ use App\Http\Controllers\AdminController;
 |
 */
 
-Route::middleware(['auth','verified'])->group(function () {
+Route::middleware(['auth','verified','staff'])->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'index']);
     Route::post('/attendance',[AttendanceController::class, 'store']);
     Route::get('/attendance/list', [AttendanceController::class, 'attendance_list']);
-    Route::get('//attendance/detail/{attendacne_id}', [AttendanceController::class, 'attendance_detail']);
+    Route::get('/attendance/detail/{attendacne_id}', [AttendanceController::class, 'attendance_detail']);
     Route::get('/stamp_correction_request/list', [AttendanceController::class, 'request_list']);
 });
-//Route::prefix('admin')->group(function () {
-    Route::get('/admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
-    //Route::post('/login', [AdminController::class, 'login']);
-//});
 Route::prefix('admin')->group(function () {
+    Route::get('/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/login', [AdminController::class, 'login']);
+});
+Route::prefix('admin')->middleware(['auth','admin','verified'])->group(function () {
     Route::get('/attendance/list', [AdminController::class, 'index']);
     Route::get('/attendance/detail/{attendance_id}', [AdminController::class, 'admin_attendance_detail']);
     Route::get('/staff/list', [AdminController::class, 'admin_staff_list']);
