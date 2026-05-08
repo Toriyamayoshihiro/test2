@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Enums;
 
 enum AttendanceRequestStatus: int

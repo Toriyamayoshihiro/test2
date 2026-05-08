@@ -16,6 +16,10 @@ class RestStampCorrectionRequest extends Model
         'request_rest_start',
         'request_rest_end',
     ];
+    protected $casts = [
+        'request_rest_end' => 'datetime',
+        'request_rest_start' => 'datetime'
+    ];
     public function attendance(){ 
         return $this->belongsTo(Attendance::class);
     }

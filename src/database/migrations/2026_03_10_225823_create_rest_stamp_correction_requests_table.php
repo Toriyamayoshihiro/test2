@@ -16,7 +16,7 @@ class CreateRestStampCorrectionRequestsTable extends Migration
         Schema::create('rest_stamp_correction_requests', function (Blueprint $table) {
             $table->id();
             $table->dateTime('request_rest_start');
-            $table->dateTime('request_end_start');
+            $table->dateTime('request_rest_end');
             $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();

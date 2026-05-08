@@ -19,7 +19,8 @@ Route::middleware(['auth','verified','staff'])->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'index']);
     Route::post('/attendance',[AttendanceController::class, 'store']);
     Route::get('/attendance/list', [AttendanceController::class, 'attendance_list']);
-    Route::get('/attendance/detail/{attendacne_id}', [AttendanceController::class, 'attendance_detail']);
+    Route::get('/attendance/detail/{attendance_id}', [AttendanceController::class, 'attendance_detail'])->name('attendance.detail');
+    Route::post('/attendance/detail/{attendance_id}', [AttendanceController::class, 'attendance_detail_modify']);
     Route::get('/stamp_correction_request/list', [AttendanceController::class, 'request_list']);
 });
 Route::prefix('admin')->group(function () {

@@ -21,7 +21,10 @@ class StampCorrectionRequest extends Model
     ];
     protected $casts = [
         'status' => AttendanceRequestStatus::class,
+        'request_start_time' => 'datetime',
+        'request_end_time' => 'datetime',
     ];
+    
     public function attendance(){ 
         return $this->belongsTo(Attendance::class);
     }

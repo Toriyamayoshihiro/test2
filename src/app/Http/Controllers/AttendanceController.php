@@ -12,6 +12,7 @@ use App\Models\RestStampCorrectionRequest;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Enums\AttendanceStatus;
+use App\Enums\AttendanceRequestStatus;
 
 class AttendanceController extends Controller
 {
@@ -145,26 +146,56 @@ class AttendanceController extends Controller
     }
     public function attendance_detail($attendance_id){
         $attendance = Attendance::with(['user','rests','stamp','rests_stamp'])->findOrFail($attendance_id); 
-        $stamp = StampCorrectionRequest::where('attendance_id',$attendance_id)->first();
+        
+        $stamp = StampCorrectionRequest::where('attendance_id',$attendance_id)->where('status',0)->first();
         $message = $stamp ? '承認待ちのため修正はできません。' : '';
 
-        return view('attendance_detail',compact('attendance','stamp','message'));
+        return view('attendance_detail',compact('attendance','stamp','message','attendance_id'));
+    }
+    public function attendance_detail_modify(Request $request, $attendance_id){
+        $user = Auth::user();
+        $attendance = Attendance::findOrFail($attendance_id);
+        $requestStartTime = Carbon::parse(
+            $attendance->date->toDateString() . '' . $request->start_time
+                    );
+        $requestEndTime = Carbon::parse(
+            $attendance->date->toDateString() . '' . $request->end_time
+        );
+        $stamp = StampCorrectionRequest::create([
+            'request_start_time' => $requestStartTime,
+            'request_end_time' => $requestEndTime,
+            'memo' => $request->note,
+            'attendance_id' => $attendance_id,
+            'status' => 0
+        ]);
+        foreach ($request->rests as $rest){
+            if(empty($rest['rest_start']) || empty($rest['rest_end'])){
+				continue;
+			}
+            $rest_stamp = RestStampCorrectionRequest::create([
+                'request_rest_start' => Carbon::parse($attendance->date->toDateString() . '' . $rest['rest_start']),
+                'request_rest_end' => Carbon::parse($attendance->date->toDateString() . '' . $rest['rest_end']),
+                'attendance_id' => $attendance_id,
+            ]);
+        }
+        return redirect()->route('attendance.detail' , ['attendance_id' => $attendance_id]);          
+
     }
     public function request_list(Request $request){
         $user = Auth::user();
         $type = $request->tab ?? '';
+
         $query = StampCorrectionRequest::with('attendance')
         ->whereHas('attendance',function ($q) use ($user){
             $q->where('user_id',$user->id);
             });
         if($type==='approved'){
-            $query->where('status',1);
-                
-                                
+            $query->where('status',AttendanceRequestStatus::Approved->value);
+
         }else{
-             $query->where('status',0);
+             $query->where('status',AttendanceRequestStatus::Pending->value);
         }   
         $stamps = $query->get();
-        return view('request_list',compact('user','stamps'));
+        return view('request_list',compact('user','stamps','type'));
     }
 }

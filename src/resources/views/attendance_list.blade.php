@@ -7,6 +7,9 @@
 @section('content')
 
 @include('components.header')
+<div class="content__header">
+        <h2 class="content__header--item">勤怠一覧</h2>
+ </div>
 <a href="/attendance/list?month={{$prevMonth }}" class="month-nav__link">
     ←前月
 </a>
