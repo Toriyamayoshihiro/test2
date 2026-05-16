@@ -14,32 +14,40 @@
             <h2 class="content__header--item">勤怠詳細</h2>
     </div>
 
-    <form action="/attendance/detail/{{$attendance_id}}" method="post">
+    <form action="{{ $attendance ? '/attendance/detail/' . $attendance->id : '/attendance/detail/date/' . $date }}" method="post">
+    
         @csrf
         <table>
             
                 <tr>
                     <th>名前</th>
-                    <td>{{$attendance->user->name}}</td>
+                    <td>{{$attendance ? $attendance->user->name : $user->name}}</td>
                 </tr>
                 <tr>
                     <th>日付</th>
-                    <td>{{$attendance->date->locale('ja')->isoFormat('YYYY M月D日')}}</td>
+                    <td>{{$attendance ? $attendance->date->locale('ja')->isoFormat('YYYY M月D日')
+                            : \Carbon\Carbon::parse($date)->locale('ja')->isoFormat('YYYY年M月D日')}}</td>
                 </tr>
                 <tr>
                     <th>出勤・退勤</th>
                     <td>
                         <input type="text" @if($stamp) readonly @endif
-                        name=start_time 
-                        value="{{$stamp ? $stamp->request_start_time->format('H:i') : $attendance->start_time->format('H:i')}}">
+                        name="start_time" 
+                        value="{{$stamp
+                                    ? $stamp->request_start_time->format('H:i')
+                                    : ($attendance && $attendance->start_time
+                                    ? $attendance->start_time->format('H:i') : '') }}"
                         <span>～</span>
                         <input type="text" @if($stamp) readonly @endif
                         name="end_time" 
-                        value="{{$stamp ? $stamp->request_end_time->format('H:i') : $attendance->end_time->format('H:i')}}">
+                        value="{{$stamp
+                                    ? $stamp->request_end_time->format('H:i')
+                                    : ($attendance && $attendance->end_time
+                                    ? $attendance->end_time->format('H:i') : '') }}"
                     </td>
                 </tr>
                 @php
-                    $displayRests = $stamp ? $attendance->rests_stamp : $attendance->rests;
+                    $displayRests = $attendance ? ($stamp ? $attendance->rests_stamp : $attendance->rests) : collect();
                 @endphp
 
                 @foreach($displayRests as $rest)
@@ -65,16 +73,16 @@
                 @endforeach
                 @if(!$stamp)
                 <tr>
-                    <th>休憩{{$attendance->rests->count() +1}}</th>
+                    <th>休憩{{$attendance ? $attendance->rests->count() +1 : 1}}</th>
                     <td>
-                        <input type="text" @if($stamp) readonly @endif
-                        name="rests[{{ $attendance->rests->count() }}][rest_start]"
-                        value="{{ old('rests.' . $attendance->rests->count() . '.rest_start') }}">
+                        <input type="text" 
+                        name="rests[{{ $attendance ? $attendance->rests->count() : 0 }}][rest_start]"
+                        value="">
                         <span>～</span>
                         <input
-                        type="text" @if($stamp) readonly @endif
-                        name="rests[{{ $attendance->rests->count() }}][rest_end]"
-                        value="{{ old('rests.' . $attendance->rests->count() . '.rest_end') }}">
+                        type="text" 
+                        name="rests[{{ $attendance ? $attendance->rests->count() : 0 }}][rest_end]"
+                        value="">
                     </td>
                 </tr>
                 @endif

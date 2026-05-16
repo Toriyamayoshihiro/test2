@@ -116,6 +116,7 @@ class AttendanceController extends Controller
         }
 
         $attendances = Attendance::where('user_id',$user->id)
+                                    ->whereNotNull('start_time')
                                     ->whereNotNull('end_time')->whereBetween('date',[
                                         $startOfMonth->toDateString(),
                                         $endOfMonth->toDateString()
@@ -130,6 +131,12 @@ class AttendanceController extends Controller
         $selectedMonth = $date->format('Y/m');
         foreach($attendances as $attendance){
             $total_rests = 0;
+
+            if(!$attendance->start_time || !$attendance->end_time){
+                $attendance->total_rests = 0;
+                $attendance->total_total_attendances = 0;
+                continue; 
+            }
             $work_time = $attendance->start_time->diffInSeconds($attendance->end_time);
             foreach($attendance->rests as $rest){
                 if($rest->rest_start && $rest->rest_end){
@@ -151,6 +158,18 @@ class AttendanceController extends Controller
         $message = $stamp ? '承認待ちのため修正はできません。' : '';
 
         return view('attendance_detail',compact('attendance','stamp','message','attendance_id'));
+    }
+    public function attendance_detail_by_date($date){
+        $user = Auth::user();
+
+        $attendance = Attendance::where('user_id','$user->id')
+                                    ->where('date','$date')
+                                    ->with(['user','rests'])->first();
+
+        $stamp = null ;
+        $message = '';
+
+        return view('attendance_detail',compact('attendance','stamp','message','date','user'));
     }
     public function attendance_detail_modify(Request $request, $attendance_id){
         $user = Auth::user();
@@ -181,6 +200,38 @@ class AttendanceController extends Controller
         return redirect()->route('attendance.detail' , ['attendance_id' => $attendance_id]);          
 
     }
+    public function attendance_detail_modify_by_date(Request $request, $date)
+        {
+        $user = Auth::user();
+        $attendance = Attendance::create([
+            'user_id' => $user->id,
+            'date' => $date,
+            'start_time' => null,
+            'end_time' => null,
+        ]);
+
+        $stamp = StampCorrectionRequest::create([
+            'request_start_time' => Carbon::parse($date . ' ' . $request->start_time),
+            'request_end_time' => Carbon::parse($date . ' ' . $request->end_time),
+            'memo' => $request->note,
+            'attendance_id' => $attendance->id,
+            'status' => 0,
+        ]);
+
+        foreach ($request->input('rests', []) as $rest) {
+            if (empty($rest['rest_start']) && empty($rest['rest_end'])) {
+                continue;
+            }
+
+            RestStampCorrectionRequest::create([
+                'attendance_id' => $attendance->id,
+                'request_rest_start' => Carbon::parse($date . ' ' . $rest['rest_start']),
+                'request_rest_end' => Carbon::parse($date . ' ' . $rest['rest_end']),
+            ]);
+        }
+
+        return redirect('/attendance/detail/' . $attendance->id);
+        }
     public function request_list(Request $request){
         $user = Auth::user();
         $type = $request->tab ?? '';

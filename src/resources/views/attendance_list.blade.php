@@ -50,15 +50,15 @@
         
         <td class="attendance_label">{{$attendance->start_time->format('H:i')}}</td>
         <td class="attendance_label">{{$attendance->end_time->format('H:i')}}</td>
-        <td class="attendance_label">{{floor($attendance->total_rests / 3600)}}:{{floor($attendance->total_rests % 3600) / 60}}</td>
-        <td class="attendance_label">{{floor($attendance->total_attendances /3600)}}:{{floor($attendance->total_attendances % 3600) / 60}}</td>
+        <td class="attendance_label">{{ sprintf('%d:%02d',floor($attendance->total_rests / 3600),floor(($attendance->total_rests % 3600) / 60))}}</td>
+        <td class="attendance_label">{{sprintf('%d:%02d',floor($attendance->total_attendances / 3600),floor(($attendance->total_attendances % 3600) / 60))}}</td>
         <td class="attendance_label"><a href="/attendance/detail/{{$attendance->id}}">詳細</a></td> 
         @else
         <td class="attendance_label"></td>
         <td class="attendance_label"></td>
         <td class="attendance_label"></td>
         <td class="attendance_label"></td>
-        <td class="attendance_label"></td>
+        <td class="attendance_label"><a href="/attendance/detail/date/{{$day}}">詳細</a></td>
         @endif
     </tr>
     @endforeach

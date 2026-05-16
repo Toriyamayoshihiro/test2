@@ -27,9 +27,10 @@
             <th class="stamp_label">申請日時</th>
             <th class="stamp_label">詳細</th>
         </tr>
-        <tr>
+        
         @foreach($stamps as $stamp)
-            <td class="stamp_label">{{$stamp->status->label()}}<td>
+        <tr class="stamp_talbe">
+            <td class="stamp_label">{{$stamp->status->label()}}</td>
             <td class="stamp_label">{{$user->name}}</td>
             <td class="stamp_label">{{$stamp->attendance->date->format('Y/m/d')}}</td>
             <td class="stamp_label">{{$stamp->memo}}</td>
