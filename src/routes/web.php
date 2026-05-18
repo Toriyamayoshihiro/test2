@@ -35,7 +35,9 @@ Route::prefix('admin')->middleware(['auth','admin','verified'])->group(function 
     Route::post('/attendance/detail/{attendance_id}', [AdminController::class, 'admin_attendance_detail_modify']);
     Route::get('/staff/list', [AdminController::class, 'admin_staff_list']);
     Route::get('/attendance/staff/{user_id}', [AdminController::class, 'admin_staff_attendance']);
+    Route::get('/attendance/staff/{user_id}/csv', [AdminController::class, 'admin_staff_attendance_csv']);
     Route::get('/stamp_correction_request/list', [AdminController::class, 'admin_request_list']);
     Route::get('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminController::class, 'admin_request_approve']);
+    Route::post('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminController::class, 'admin_request_approved']);
     Route::get('/logout',[AdminController::class, 'getLogout'])->name('admin.logout');
 });

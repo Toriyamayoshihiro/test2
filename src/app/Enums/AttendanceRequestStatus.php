@@ -12,7 +12,7 @@ enum AttendanceRequestStatus: int
     {
         return match ($this) {
             AttendanceRequestStatus::Pending  => '承認待ち',
-            AttendanceRequestStatus::Approved => '承認',
+            AttendanceRequestStatus::Approved => '承認済み',
             AttendanceRequestStatus::Rejected => '却下'
         };
     }

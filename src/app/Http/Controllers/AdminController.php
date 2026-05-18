@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
+use App\Models\RestTime;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdminRequest;
 use App\Models\User;
@@ -123,19 +124,129 @@ class AdminController extends Controller
         
     }
    public function admin_staff_list(){
-    $users = User::where('is_admin','!','true')->get();
+    $users = User::where('is_admin', 'false')->get();
     return view('admin.admin_staff_list',compact('users'));
    }
-   public function admin_staff_attendance($user_id){
-    $attendances = Attendance::where('user_id',$user_id)->with('rests')->get();
-    return view('admin.admin_staff_attendance_list',conpact('attendances'));
-   }
-   public function admin_request_list(){
-    $stamps = StampCorrectionRequest::where('status','0')->with('attendance.user')->get();
-    return view('admin.admin_request_list',compact('stamps'));
+   public function admin_staff_attendance(Request $request, $user_id)
+    {
+        $user = User::findOrFail($user_id);
+        $date = $request->input('month')
+            ? Carbon::parse($request->input('month'))
+            : Carbon::now();
+
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
+
+        $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
+
+        $dates = [];
+        foreach ($period as $day) {
+            $dates[] = $day->toDateString();
+        }
+
+        $attendances = Attendance::where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startOfMonth->toDateString(),
+                $endOfMonth->toDateString()
+            ])
+            ->with('rests')
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->date->toDateString();
+            });
+
+        foreach ($attendances as $attendance) {
+            $totalRests = 0;
+
+            foreach ($attendance->rests as $rest) {
+                if ($rest->rest_start && $rest->rest_end) {
+                    $totalRests += $rest->rest_start->diffInSeconds($rest->rest_end);
+                }
+            }
+
+            $workTime = 0;
+            if ($attendance->start_time && $attendance->end_time) {
+                $workTime = $attendance->start_time->diffInSeconds($attendance->end_time);
+            }
+
+            $attendance->total_rests = $totalRests;
+            $attendance->total_attendances = $workTime - $totalRests;
+        }
+
+        $currentMonth = $date->format('Y/m');
+        $prevMonth = $date->copy()->subMonth()->format('Y-m');
+        $nextMonth = $date->copy()->addMonth()->format('Y-m');
+        $csvMonth = $date->format('Y-m');
+
+        return view('admin.admin_staff_attendance_list', compact(
+            'user',
+            'dates',
+            'attendances',
+            'currentMonth',
+            'prevMonth',
+            'nextMonth',
+            'csvMonth'
+        ));
+    }
+   public function admin_request_list(Request $request){
+    $type = $request->tab ?? '';
+
+    $query = StampCorrectionRequest::with('attendance.user');
+
+    if($type === 'approved' ){
+        $query->where('status',AttendanceRequestStatus::Approved->value);
+    }else {
+        $query->where('status',AttendanceRequestStatus::Pending->value);
+    }
+    
+    $stamps = $query->latest()->get();
+
+    foreach($stamps as $stamp){
+        
+        $stamp->statusLabel = $stamp->status->label();
+    }
+
+    return view('admin.admin_request_list',compact('stamps','type',));
    }
    public function admin_request_approve($stamp_id){
-        $stamp = StampCorrectionRequest::with('attendance.user','attendance.stamp_rest')->find($stamp_id);
+        $stamp = StampCorrectionRequest::with('attendance.user','attendance.rests_stamp')->findOrFail($stamp_id);
+
+        $stamp->statusLabel = $stamp->status->label();
+
+        
         return view('admin.admin_correction_approve',compact('stamp'));
    }
+   public function admin_request_approved($stamp_id)
+    {
+        $stamp = StampCorrectionRequest::with([
+        'attendance.rests',
+        'attendance.rests_stamp',
+        ])->findOrFail($stamp_id);
+
+        $attendance = $stamp->attendance;
+
+        // 勤怠本体を更新
+        $attendance->start_time = $stamp->request_start_time;
+        $attendance->end_time = $stamp->request_end_time;
+        $attendance->save();
+
+        // 既存休憩を削除
+        $attendance->rests()->delete();
+
+        // 修正申請の休憩を本テーブルに反映
+        foreach ($attendance->rests_stamp as $restStamp) {
+            RestTime::create([
+                'attendance_id' => $attendance->id,
+                'rest_start' => $restStamp->request_rest_start,
+                'rest_end' => $restStamp->request_rest_end,
+            ]);
+        }
+
+        // 申請ステータスを承認済みに変更
+        $stamp->status = AttendanceRequestStatus::Approved;
+        $stamp->save();
+        
+
+        return redirect('/admin/stamp_correction_request/approve/' . $stamp->id);
+}
 }
