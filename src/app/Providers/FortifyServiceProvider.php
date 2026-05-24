@@ -14,6 +14,11 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
+use App\Http\Requests\LoginRequest;
+use Laravel\Fortify\Http\Requests\RegisterRequest as FortifyRegisterRequest;
+use App\Http\Requests\RegisterRequest;
+use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Contracts\LoginResponse;
 
@@ -64,6 +69,9 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(function () {
          return view('auth.login');
         });
+         Fortify::verifyEmailView(function () {
+            return view('auth.verify-email');
+        });
 
         RateLimiter::for('login', function (Request $request) {
             $email = (string) $request->email;
@@ -81,5 +89,7 @@ class FortifyServiceProvider extends ServiceProvider
             }
             return !$user->is_admin ? $user :null;
         });
+        $this->app->bind(FortifyLoginRequest::class, LoginRequest::class);
+        $this->app->bind(FortifyRegisterRequest::class, RegisterRequest::class);
     }
 }

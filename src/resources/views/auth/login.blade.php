@@ -5,6 +5,11 @@
 @endsection
 
 @section('content')
+
+<div class="header">
+  <h1 class="header__logo">COACHTECH</h1>
+</div>
+
 <div class="login-form__content">
   <div class="login-form__heading">
     <h1>ログイン</h1>

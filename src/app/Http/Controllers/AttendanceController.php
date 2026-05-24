@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Enums\AttendanceStatus;
 use App\Enums\AttendanceRequestStatus;
+use App\Http\Requests\StampCorrectionRequest as StampCorrectionRequestForm;
 
 class AttendanceController extends Controller
 {
@@ -159,26 +160,15 @@ class AttendanceController extends Controller
 
         return view('attendance_detail',compact('attendance','stamp','message','attendance_id'));
     }
-    public function attendance_detail_by_date($date){
-        $user = Auth::user();
-
-        $attendance = Attendance::where('user_id','$user->id')
-                                    ->where('date','$date')
-                                    ->with(['user','rests'])->first();
-
-        $stamp = null ;
-        $message = '';
-
-        return view('attendance_detail',compact('attendance','stamp','message','date','user'));
-    }
-    public function attendance_detail_modify(Request $request, $attendance_id){
+    
+    public function attendance_detail_modify(StampCorrectionRequestForm $request, $attendance_id){
         $user = Auth::user();
         $attendance = Attendance::findOrFail($attendance_id);
         $requestStartTime = Carbon::parse(
-            $attendance->date->toDateString() . '' . $request->start_time
+            $attendance->date->toDateString() . ' ' . $request->start_time
                     );
         $requestEndTime = Carbon::parse(
-            $attendance->date->toDateString() . '' . $request->end_time
+            $attendance->date->toDateString() . ' ' . $request->end_time
         );
         $stamp = StampCorrectionRequest::create([
             'request_start_time' => $requestStartTime,
@@ -192,46 +182,15 @@ class AttendanceController extends Controller
 				continue;
 			}
             $rest_stamp = RestStampCorrectionRequest::create([
-                'request_rest_start' => Carbon::parse($attendance->date->toDateString() . '' . $rest['rest_start']),
-                'request_rest_end' => Carbon::parse($attendance->date->toDateString() . '' . $rest['rest_end']),
+                'request_rest_start' => Carbon::parse($attendance->date->toDateString() . ' ' . $rest['rest_start']),
+                'request_rest_end' => Carbon::parse($attendance->date->toDateString() . ' ' . $rest['rest_end']),
                 'attendance_id' => $attendance_id,
             ]);
         }
         return redirect()->route('attendance.detail' , ['attendance_id' => $attendance_id]);          
 
     }
-    public function attendance_detail_modify_by_date(Request $request, $date)
-        {
-        $user = Auth::user();
-        $attendance = Attendance::create([
-            'user_id' => $user->id,
-            'date' => $date,
-            'start_time' => null,
-            'end_time' => null,
-        ]);
-
-        $stamp = StampCorrectionRequest::create([
-            'request_start_time' => Carbon::parse($date . ' ' . $request->start_time),
-            'request_end_time' => Carbon::parse($date . ' ' . $request->end_time),
-            'memo' => $request->note,
-            'attendance_id' => $attendance->id,
-            'status' => 0,
-        ]);
-
-        foreach ($request->input('rests', []) as $rest) {
-            if (empty($rest['rest_start']) && empty($rest['rest_end'])) {
-                continue;
-            }
-
-            RestStampCorrectionRequest::create([
-                'attendance_id' => $attendance->id,
-                'request_rest_start' => Carbon::parse($date . ' ' . $rest['rest_start']),
-                'request_rest_end' => Carbon::parse($date . ' ' . $rest['rest_end']),
-            ]);
-        }
-
-        return redirect('/attendance/detail/' . $attendance->id);
-        }
+    
     public function request_list(Request $request){
         $user = Auth::user();
         $type = $request->tab ?? '';

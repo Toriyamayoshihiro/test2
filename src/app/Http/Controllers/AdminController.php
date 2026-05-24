@@ -14,6 +14,9 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Enums\AttendanceStatus;
 use App\Enums\AttendanceRequestStatus;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\StampCorrectionRequest as StampCorrectionRequestForm;
+
 
 class AdminController extends Controller
 {
@@ -21,7 +24,7 @@ class AdminController extends Controller
     {
         return view('admin.admin_login');
     }
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
         $credentials['is_admin'] = true;
@@ -83,7 +86,7 @@ class AdminController extends Controller
 
         return view('admin.admin_attendance_detail',compact('attendance','stamp','message'));
     }
-    public function admin_attendance_detail_modify(Request $request, $attendance_id){
+    public function admin_attendance_detail_modify(StampCorrectionRequestForm $request, $attendance_id){
         $attendance = Attendance::with('rests')->findOrFail($attendance_id);
 
         $date = $attendance->date->toDateString();

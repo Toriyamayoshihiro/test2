@@ -5,12 +5,17 @@
 @endsection
 
 @section('content')
+
+<div class="header">
+  <h1 class="header__logo">COACHTECH</h1>
+</div>
+
 <div class="verify">
-    <p class="verigy_message">登録していただいたメールアドレスに認証メールを送付しました。
+    <p class="verify_message">登録していただいたメールアドレスに認証メールを送付しました。
         メール認証を完了してください。
     </p>
     <div class="mail-verify__link">
-        <a class="link" href="http://localhost:8025" target="brank" rel="nopener">認証はこちらから</a>
+        <a class="link" href="http://localhost:8025" target="blank" rel="noopener">認証はこちらから</a>
     </div>
     <form action="{{route('verification.send')}}"  method="post">
         @csrf

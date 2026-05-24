@@ -1,12 +1,13 @@
 @extends('layouts.default')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/login.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin_correction_approve.css') }}">
+<link rel="stylesheet" href="{{ asset('css/header.css') }}">
 @endsection
 
 @section('content')
 @include('components.header')
-
+<div class="content__header">
     <h2 class="content__header--item">勤怠詳細</h2>
 </div>
 
@@ -53,7 +54,7 @@
     @if($stamp->status->value === 0)
         <button type="submit">承認</button>
     @else
-        <div>
+        <div class="approved_status">
             {{$stamp->statusLabel}}
         </div>
         

@@ -1,0 +1,163 @@
+body{
+background-color: #f5f5f5;
+margin: 0;
+font-family: sans-serif;
+}
+
+/* 全体 */
+.attendance-detail{
+width: 900px;
+margin: 50px auto;
+}
+
+/* タイトル */
+.content__header{
+width: 900px;
+margin: 40px auto 30px;
+}
+
+.content__header--item{
+font-size: 30px;
+font-weight: bold;
+border-left: 6px solid #000;
+padding-left: 15px;
+color: #222;
+}
+
+/* テーブル */
+.attendance-detail__table{
+width: 100%;
+background-color: #fff;
+border-collapse: collapse;
+border-radius: 10px;
+overflow: hidden;
+box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.attendance-detail__table tr{
+border-bottom: 1px solid #e5e5e5;
+}
+
+.attendance-detail__table th{
+width: 180px;
+padding: 28px 20px;
+background-color: #fafafa;
+color: #555;
+font-size: 15px;
+text-align: left;
+font-weight: bold;
+}
+
+.attendance-detail__table td{
+padding: 20px;
+font-size: 16px;
+color: #222;
+text-align: center;
+}
+
+/* input */
+.attendance-detail__table input{
+width: 90px;
+height: 42px;
+border: 1px solid #d9d9d9;
+border-radius: 6px;
+text-align: center;
+font-size: 18px;
+background-color: #fff;
+}
+
+/* textarea */
+.attendance-detail__table textarea{
+width: 100%;
+max-width: 500px;
+height: 80px;
+border: 1px solid #d9d9d9;
+border-radius: 6px;
+resize: none;
+padding: 10px;
+font-size: 15px;
+}
+
+/* readonly */
+.attendance-detail__table input[readonly],
+.attendance-detail__table textarea[readonly]{
+background-color: #f7f7f7;
+}
+
+/* 波線 */
+.attendance-detail__table td:nth-child(3){
+width: 40px;
+font-size: 20px;
+font-weight: bold;
+}
+
+/* ボタン */
+button{
+display: block;
+margin-left: auto;
+margin-top: 30px;
+width: 130px;
+height: 50px;
+border: none;
+border-radius: 6px;
+background-color: #000;
+color: #fff;
+font-size: 18px;
+font-weight: bold;
+cursor: pointer;
+}
+
+button:hover{
+opacity: 0.8;
+}
+
+/* エラー */
+.form_error,
+.form__error{
+margin-top: 8px;
+color: #ff4d4f;
+font-size: 13px;
+text-align: left;
+}
+
+/* 承認待ちメッセージ */
+.stamp_message{
+margin-top: 25px;
+text-align: right;
+color: #ff6b81;
+font-size: 16px;
+font-weight: bold;
+}
+
+/* レスポンシブ */
+@media screen and (max-width: 768px){
+
+```
+.attendance-detail{
+    width: 95%;
+}
+
+.content__header{
+    width: 95%;
+}
+
+.attendance-detail__table th,
+.attendance-detail__table td{
+    padding: 15px 10px;
+    font-size: 14px;
+}
+
+.attendance-detail__table input{
+    width: 75px;
+    font-size: 15px;
+}
+
+button{
+    width: 100%;
+}
+.date-cell{
+white-space: nowrap;
+min-width: 120px;
+}
+
+}

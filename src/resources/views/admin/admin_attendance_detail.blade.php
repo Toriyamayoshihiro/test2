@@ -1,7 +1,8 @@
 @extends('layouts.default')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/login.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin_attendance_detail.css') }}">
+<link rel="stylesheet" href="{{ asset('css/header.css') }}">
 @endsection
 
 @section('content')
@@ -22,7 +23,7 @@
     <tr>
         <th>日付</th>
         <td>{{ $attendance->date->format('Y年') }}</td>
-        <td>{{ $attendance->date->format('n月j日') }}</td>
+        <td class="date-cell">{{ $attendance->date->format('n月j日') }}</td>
     </tr>
 
     <tr>
@@ -32,7 +33,12 @@
             name="start_time"
             value="{{ $stamp 
                 ? optional($stamp->request_start_time)->format('H:i')
-                : optional($attendance->request_start_time)->format('H:i') }}">
+                : optional($attendance->start_time)->format('H:i') }}">
+            @error('start_time')
+                <div class="form_error">
+                    {{$message}}
+                </div>
+            @enderror
         </td>
         <td>〜</td>
         <td>
@@ -40,7 +46,12 @@
             name="end_time"
             value="{{ $stamp 
                 ? optional($stamp->request_end_time)->format('H:i')
-                : optional($attendance->request_end_time)->format('H:i')}}">
+                : optional($attendance->end_time)->format('H:i')}}">
+            @error('end_time')
+                <div class="form_error">
+                    {{$message}}
+                </div>
+            @enderror
         </td>
     </tr>
 
@@ -59,6 +70,11 @@
                 ? optional($rest->request_rest_start)->format('H:i')
                 : optional($rest->rest_start)->format('H:i') }}"
                 >
+            @error('rests.' . $loop->index . '.rest_start')
+                <div class="form__error">
+                    {{ $message }}
+                </div>
+            @enderror
             </td>
             <td>〜</td>
             <td>
@@ -68,6 +84,11 @@
                 ? optional($rest->request_rest_end)->format('H:i')
                 : optional($rest->rest_end)->format('H:i') }}"
                 >
+            @error('rests.' . $loop->index . '.rest_end')
+                <div class="form__error">
+                    {{ $message }}
+                </div>
+            @enderror
             </td>
         </tr>
     @endforeach
@@ -88,7 +109,11 @@
                 value=""
 
             >
-
+            @error('rests.' . ($attendance ? $attendance->rests->count() : 0) . '.rest_start')
+                <div class="form__error">
+                    {{ $message }}
+                </div>
+            @enderror
         </td>
         <td>〜</td>
         <td>
@@ -98,7 +123,11 @@
                 name="rests[{{ $attendance->rests->count() }}][rest_end]"
 
                 value=""        >
-
+            @error('rests.' . ($attendance ? $attendance->rests->count() : 0) . '.rest_end')
+                <div class="form__error">
+                    {{ $message }}
+                </div>
+            @enderror
         </td>
     </tr>
     @endif
@@ -115,6 +144,11 @@
         <th>備考</th>
         <td >
             <textarea name="note" @if($stamp) readonly @endif>{{ old('note', $stamp ? $stamp->memo : '') }}</textarea>
+            @error('note')
+                <div class="form_error">
+                    {{$message}}
+                </div>
+            @enderror
         </td>
     </tr>
 </table>
