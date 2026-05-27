@@ -32,7 +32,7 @@ class AdminController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect('/admin/attendance/list');
         }
-        return back()->withErrors(['email' => 'ログインに失敗しました']);
+        return back()->withErrors(['email' => 'ログイン情報が登録されていません']);
     }
     
     public function getLogout(){
