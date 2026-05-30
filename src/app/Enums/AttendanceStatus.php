@@ -24,11 +24,12 @@ enum AttendanceStatus: int
                 ],
             self::Working => [
                 ['label' => '退勤' , 'value' => 'out_attendance'],
-                ['label' => '休憩' , 'value' => 'in_rest']
+                ['label' => '休憩入' , 'value' => 'in_rest']
                 ],
             self::Resting => [
                 ['label' => '休憩戻' , 'value' => 'out_rest'],
                 ],
         };
     }
+    
 }

@@ -75,10 +75,10 @@ class StampCorrectionRequest extends FormRequest
                     continue;
                 }
 
-                if ($restStart < $startTime) {
+                if ($restStart >= $endTime) {
                     $validator->errors()->add(
                         "rests.$index.rest_start",
-                        '休憩時間もしくは退勤時間が不適切な値です'
+                        '休憩時間が不適切な値です'
                     );
                 }
 
@@ -112,10 +112,10 @@ class StampCorrectionRequest extends FormRequest
         return [
 
             'start_time.required' => '出勤時間を入力してください',
-            'start_time.before' => '出勤時間は時間もしくは退勤時間が不適切な値です',
+            'start_time.before' => '出勤時間が不適切な値です',
 
             'end_time.required' => '退勤時間を入力してください',
-            'end_time.after' => '出勤時間は時間もしくは退勤時間が不適切な値です',
+            'end_time.after' => '出勤時間が不適切な値です',
 
             'note.required' => '備考を記入してください',
 
