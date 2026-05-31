@@ -48,7 +48,7 @@ class AdminController extends Controller
         $prevDate = $date->copy()->subDay()->format('Y-m-d');
         $nextDate = $date->copy()->addDay()->format('Y-m-d');
 
-        $users =  User::where('is_admin', 'false')
+        $users =  User::where('is_admin', false)
                         ->whereHas('attendances', function ($query) use ($date) {
                                 $query->whereDate('date', $date->toDateString());
                                 })
@@ -228,15 +228,12 @@ class AdminController extends Controller
 
         $attendance = $stamp->attendance;
 
-        // 勤怠本体を更新
         $attendance->start_time = $stamp->request_start_time;
         $attendance->end_time = $stamp->request_end_time;
         $attendance->save();
 
-        // 既存休憩を削除
         $attendance->rests()->delete();
 
-        // 修正申請の休憩を本テーブルに反映
         foreach ($attendance->rests_stamp as $restStamp) {
             RestTime::create([
                 'attendance_id' => $attendance->id,
@@ -245,7 +242,6 @@ class AdminController extends Controller
             ]);
         }
 
-        // 申請ステータスを承認済みに変更
         $stamp->status = AttendanceRequestStatus::Approved;
         $stamp->save();
         

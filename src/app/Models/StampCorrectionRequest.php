@@ -13,7 +13,7 @@ class StampCorrectionRequest extends Model
     use SoftDeletes;
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'attendance_status',
+        'status',
         'request_start_time',
         'request_end_time',
         'memo',
