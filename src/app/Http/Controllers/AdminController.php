@@ -191,6 +191,95 @@ class AdminController extends Controller
             'csvMonth'
         ));
     }
+    public function admin_staff_attendance_csv(Request $request, $user_id)
+    {
+        $user = User::findOrFail($user_id);
+
+        $month = $request->input('month')
+            ? Carbon::parse($request->input('month'))
+            : Carbon::now();
+
+        $startOfMonth = $month->copy()->startOfMonth();
+        $endOfMonth = $month->copy()->endOfMonth();
+
+        $attendances = Attendance::where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startOfMonth->toDateString(),
+                $endOfMonth->toDateString()
+            ])
+            ->with('rests')
+            ->get();
+
+        $csvData = [];
+
+        $csvData[] = [
+            '日付',
+            '出勤',
+            '退勤',
+            '休憩時間',
+            '勤務時間'
+        ];
+
+        foreach ($attendances as $attendance) {
+
+            $totalRests = 0;
+
+            foreach ($attendance->rests as $rest) {
+                if ($rest->rest_start && $rest->rest_end) {
+                    $totalRests += $rest->rest_start->diffInSeconds($rest->rest_end);
+                }
+            }
+
+            $workTime = 0;
+
+            if ($attendance->start_time && $attendance->end_time) {
+                $workTime =
+                    $attendance->start_time->diffInSeconds($attendance->end_time)
+                    - $totalRests;
+            }
+
+            $csvData[] = [
+                $attendance->date->format('Y/m/d'),
+                optional($attendance->start_time)->format('H:i'),
+                optional($attendance->end_time)->format('H:i'),
+                sprintf(
+                    '%d:%02d',
+                    floor($totalRests / 3600),
+                    floor(($totalRests % 3600) / 60)
+                ),
+                sprintf(
+                    '%d:%02d',
+                    floor($workTime / 3600),
+                    floor(($workTime % 3600) / 60)
+                ),
+            ];
+        }
+
+        $filename =
+            $user->name . '_' .
+            $month->format('Y_m') .
+            '_attendance.csv';
+
+        $handle = fopen('php://temp', 'r+');
+
+        foreach ($csvData as $row) {
+            fputcsv($handle, $row);
+        }
+
+        rewind($handle);
+
+        $csv = stream_get_contents($handle);
+
+        fclose($handle);
+
+        return response($csv)
+            ->header('Content-Type', 'text/csv')
+            ->header(
+                'Content-Disposition',
+                'attachment; filename="' . $filename . '"'
+            );
+    }
+
    public function admin_request_list(Request $request){
     $type = $request->tab ?? '';
 
