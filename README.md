@@ -68,7 +68,31 @@ php artisan db:seed
 
 
 ## テスト実行方法
-``` bash
+```
+docker-compose exec mysql bash
+mysql -u root -p
+CREATE DATABASE demo_test;
+
+### .env.testing設定
+
+```env
+APP_ENV=test
+APP_KEY=
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=demo_test
+DB_USERNAME=root
+DB_PASSWORD=root
+```
+
+### テスト用APP_KEY作成
+
+```bash
+php artisan key:generate --env=testing
+```
+ bash
 php artisan test
 または
 vendor/bin/phpunit
