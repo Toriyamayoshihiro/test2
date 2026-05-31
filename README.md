@@ -68,12 +68,21 @@ php artisan db:seed
 
 
 ## テスト実行方法
-```
+
+### テスト用データベース作成
+
+```bash
 docker-compose exec mysql bash
 mysql -u root -p
-CREATE DATABASE demo_test;
+```
 
-### .env.testing設定
+パスワードは `root` を入力します。
+
+```sql
+CREATE DATABASE demo_test;
+```
+
+### .env.testing 設定
 
 ```env
 APP_ENV=test
@@ -90,11 +99,19 @@ DB_PASSWORD=root
 ### テスト用APP_KEY作成
 
 ```bash
+docker-compose exec php bash
 php artisan key:generate --env=testing
 ```
- bash
+
+### テスト実行
+
+```bash
 php artisan test
+```
+
 または
+
+```bash
 vendor/bin/phpunit
 ```
 ## MailHog
